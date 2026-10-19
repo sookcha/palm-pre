@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Palm webOS · WebAssembly</title>
+  </head>
+  <body>
+    <main>
+      <h1>Palm webOS</h1>
+      <p>Real webOS 1.4.5 SDK image running locally in WebAssembly with v86.</p>
+      <p id="status" role="status">Ready to boot.</p>
+      <div class="controls">
+        <button id="start">Boot webOS</button>
+        <button data-key="36" disabled>Card view (Home)</button>
+        <button data-key="35" disabled>Launcher (End)</button>
+        <button data-key="27" disabled>Back (Esc)</button>
+      </div>
+      <div id="screen" tabindex="0" aria-label="webOS emulator display">
+        <div style="white-space: pre; font: 14px monospace; line-height: 14px"></div>
+        <canvas style="display: none"></canvas>
+      </div>
+      <p>Click or tap the display to interact; drag to scroll. Single-touch gestures are supported. Guest changes are lost when this page closes.</p>
+    </main>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,49 @@
+{
+  "emulator": {
+    "project": "https://github.com/copy/v86",
+    "version": "0.5.472",
+    "commit": "cc37f35",
+    "license": "BSD-2-Clause",
+    "licenseFile": "public/licenses/v86-LICENSE"
+  },
+  "bios": {
+    "source": "https://github.com/copy/v86/tree/cc37f35/bios",
+    "upstream": "https://www.seabios.org/",
+    "license": "LGPL-3.0",
+    "licenseFile": "public/bios/COPYING.LESSER",
+    "runtimeVideoPatch": {
+      "purpose": "Use the phone's 320×480 32-bit framebuffer instead of 640×480 in VBE mode 0x142.",
+      "modeWidthAddress": "0xc505a",
+      "romChecksumAddress": "0xc8dff",
+      "linuxVideoModeAddress": "0x801fa",
+      "linuxVideoMode": "0x342",
+      "originalModeBytes": "42 01 06 00 80 02 e0 01 20 08 10 00 00 a0"
+    }
+  },
+  "guest": {
+    "version": "webOS 1.4.5 SDK",
+    "source": "https://archive.org/download/web-os-3.0.5.676-virtual-appliance/SDK%201.4.5.465.vmdk.zip",
+    "archiveMember": "nova-cust-image-sdk1457.vmdk",
+    "conversion": "qemu-img convert -f vmdk -O raw nova-cust-image-sdk1457.vmdk public/images/webos.img",
+    "kernel": "/boot/bzImage-2.6.26",
+    "kernelExtraction": "dd if=public/images/webos.img of=/tmp/webos-rootfs.img bs=512 skip=63; debugfs -R 'dump /boot/bzImage-2.6.26 public/images/bzImage' /tmp/webos-rootfs.img",
+    "partitionOffset": 32256,
+    "diskSize": 838926336,
+    "redistributed": true,
+    "runtimePointerPatch": {
+      "file": "/usr/lib/libhidtouchpanel.so",
+      "diskOffset": 403220381,
+      "original": "/dev/input/event3",
+      "replacement": "/dev/input/event1",
+      "purpose": "Read the v86 PS/2 mouse device; the original SDK expects two additional VirtualBox input devices. The patch is applied only to the in-memory disk overlay."
+    }
+  },
+  "pointer": {
+    "interface": "VirtualBox VMMDev 1.4, matching the SDK's Guest Additions 2.1.4",
+    "specification": "https://github.com/mirror/vbox/blob/master/include/VBox/VMMDev.h",
+    "pciSlot": 7,
+    "irq": 11,
+    "input": "Absolute VMMDev coordinates with PS/2 button and synchronization events",
+    "gestures": "One primary pointer: mouse, pen, or touch"
+  }
+}

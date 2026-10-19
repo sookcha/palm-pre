@@ -1,0 +1,10 @@
+body { margin: 0; background: #161b20; color: #edf1f4; font: 16px system-ui, sans-serif; }
+main { max-width: 960px; margin: 3rem auto; padding: 0 1rem; }
+h1 { margin-bottom: .5rem; }
+p { color: #b9c6cf; line-height: 1.5; }
+.controls { display: flex; gap: .5rem; flex-wrap: wrap; margin: 1rem 0; }
+button { padding: .65rem 1rem; border: 1px solid #638798; border-radius: .4rem; background: #234351; color: white; font: inherit; cursor: pointer; }
+button:disabled { opacity: .5; cursor: default; }
+#screen { width: fit-content; max-width: 100%; min-height: 320px; background: black; overflow: auto; }
+#screen:focus-visible { outline: 2px solid #69c9ef; }
+canvas { width: 320px !important; height: auto !important; max-width: 100%; touch-action: none; }

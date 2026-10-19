@@ -1,0 +1,53 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - uses: actions/cache@v4
+        id: guest
+        with:
+          path: public/images
+          key: webos-sdk-${{ hashFiles('sources.json') }}
+      - name: Prepare the original SDK image
+        if: steps.guest.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-utils e2fsprogs unzip
+          mkdir -p public/images
+          curl --fail --location --retry 3 "$(jq -r '.guest.source' sources.json)" -o "$RUNNER_TEMP/sdk.zip"
+          unzip -j "$RUNNER_TEMP/sdk.zip" "$(jq -r '.guest.archiveMember' sources.json)" -d "$RUNNER_TEMP"
+          qemu-img convert -f vmdk -O raw "$RUNNER_TEMP/$(jq -r '.guest.archiveMember' sources.json)" public/images/webos.img
+          dd if=public/images/webos.img of="$RUNNER_TEMP/rootfs.img" bs=1M skip="$(jq -r '.guest.partitionOffset' sources.json)" iflag=skip_bytes
+          debugfs -R "dump $(jq -r '.guest.kernel' sources.json) public/images/bzImage" "$RUNNER_TEMP/rootfs.img"
+      - run: npm test
+      - run: npm run build -- --base=/${{ github.event.repository.name }}/
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - uses: actions/deploy-pages@v4
+        id: deployment
